@@ -79,7 +79,7 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
 
       map.on('load', () => {
         // Enable globe projection after style is loaded
-        (map as any).setProjection('globe');
+        (map as any).setProjection({ type: 'globe' });
 
         setIsLoading(false);
 
