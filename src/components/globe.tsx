@@ -69,16 +69,18 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
         pitch: 0,
         bearing: 0,
         attributionControl: false,
-      } as any);
-
-      // Enable globe projection
-      (map as any).setProjection('globe');
+      });
 
       mapRef.current = map;
 
+      map.on('error', (e) => {
+        console.error('[Globe] Map error:', e.error?.message || e);
+      });
+
       map.on('load', () => {
-        // Set atmosphere/fog for globe effect
-        (map as any).setFog({});
+        // Enable globe projection after style is loaded
+        (map as any).setProjection('globe');
+
         setIsLoading(false);
 
         // Add Five Dynasties GeoJSON data
@@ -209,7 +211,8 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
       map.on('mouseleave', () => { map.getCanvas().style.cursor = ''; });
 
     } catch (err) {
-      setError('Failed to initialize map');
+      console.error('[Globe] Failed to initialize map:', err);
+      setError(`Failed to initialize map: ${err instanceof Error ? err.message : String(err)}`);
       setIsLoading(false);
     }
 
