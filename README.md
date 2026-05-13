@@ -1,385 +1,95 @@
-<p align="center">
-  <a href="https://github.com/yorkeccak/history/stargazers"><img src="https://img.shields.io/github/stars/yorkeccak/history?style=flat&color=yellow" alt="GitHub Stars"></a>
-  <a href="https://github.com/yorkeccak/history/blob/main/LICENSE"><img src="https://img.shields.io/github/license/yorkeccak/history" alt="License"></a>
-  <a href="https://github.com/yorkeccak/history/network/members"><img src="https://img.shields.io/github/forks/yorkeccak/history?style=flat" alt="Forks"></a>
-  <a href="https://github.com/yorkeccak/history/graphs/contributors"><img src="https://img.shields.io/github/contributors/yorkeccak/history" alt="Contributors"></a>
-</p>
+# History - Five Dynasties and Ten Kingdoms Edition
 
-# History
+A fork of [yorkeccak/history](https://github.com/yorkeccak/history) — an interactive 3D globe for exploring historical locations. This version replaces MapBox GL JS with **MapLibre GL JS** (open-source, no API key needed for the map) and adds a GeoJSON overlay of the **Five Dynasties and Ten Kingdoms (五代十国, 907-979 AD)** territories.
 
-**[history.valyu.ai](https://history.valyu.ai)**
+## What's Changed
 
-> I can't stop doomscrolling Google Maps so I built AI that researches anywhere on Earth
+- **MapBox → MapLibre GL JS v5**: Free, open-source map rendering with globe projection. No MapBox token required.
+- **Five Dynasties GeoJSON data**: Colored polygon boundaries for 后梁, 南唐, 吴越, 闽, 南汉, 楚, 前蜀, 荆南, 北汉 with labels.
+- **Map centered on China**: Default view at `[112°E, 33°N]` zoom 4, focused on the Five Dynasties era territories.
+- **Free tile sources**: Uses CartoDB and OpenFreeMap styles (dark-matter, positron, liberty, bright).
 
-An interactive 3D globe that lets you explore the fascinating history of any location on the planet. Born from opening Google Maps in satellite view at 2am and clicking on random shit - obscure atolls in the Pacific that look like someone dropped a pixel, unnamed mountains in Kyrgyzstan, Arctic settlements with 9 people. Places so remote they don't have Wikipedia pages.
-
-Be curious.
-
-![History](public/history.png)
-
-## The Problem
-
-I have a problem. I'll lose 6 hours to doomscrolling Google Maps. Just clicking. Finding volcanic islands that look photoshopped. Fjords that defy physics. Tiny dots of land in the middle of nowhere. And every single time I think: **what IS this place? Who found it? Why does it exist? What happened here?**
-
-Then you try to research it and it's hell. 47 Wikipedia tabs. A poorly-translated Kazakh government PDF from 2003. A travel blog from 1987. A single Reddit comment from 2014 that says "I think my uncle went there once." You piece it together like a conspiracy theorist and still don't get the full story.
-
-**The information exists somewhere.** Historical databases. Academic archives. Colonial records. Exploration logs from the 1800s. But it's scattered everywhere and takes forever to find.
-
-## The Solution
-
-Click anywhere on a globe. Get actual research. It searches hundreds of sources for up to 10 minutes and gives you the full story. With citations so you know it's not making shit up.
-
-Not ChatGPT summarizing from training data. **Actual research.** It searches:
-- Historical databases and archives
-- Academic papers and journals
-- Colonial records and exploration logs
-- Archaeological surveys
-- Wikipedia and structured knowledge bases
-- Real-time web sources
-
-**Example: Tristan da Cunha** (most remote inhabited island on Earth, population 245)
-
-Click on it and you get:
-- Discovery by Portuguese explorers in 1506
-- British annexation in 1816 (strategic location during Napoleonic Wars)
-- Volcanic eruption in 1961 that evacuated the entire population
-- Current economy (crayfish export, philately)
-- Cultural evolution of the tiny community
-- Full timeline with sources
-
-What would take hours of manual research happens automatically. And you can verify everything.
-
-## Why This Exists
-
-Because I've spent literal months of my life doomscrolling Google Maps clicking on random islands at 3am and I want to actually understand them. Not skim a 4-paragraph Wikipedia stub. Not guess based on the name. **Proper historical research. Fast.**
-
-The databases exist. The archives are digitized. The APIs are built. Someone just needed to connect them to a globe and make it accessible.
-
-**This is what AI should be doing.** Not writing emails. Augmenting genuine human curiosity about the world.
-
-## Key Features
-
-### Real Research Infrastructure
-- **Valyu DeepResearch API** - Access to academic databases, archives, historical records
-- **Runs for up to 10 minutes** - Searches hundreds of sources
-- **Full citations** - Every claim linked to verifiable sources
-- **Live progress tracking** - Watch the research unfold in real-time, see every source it queries
-
-### Interactive Globe
-- **3D Satellite Visualization** - Stunning Mapbox satellite imagery with globe projection
-- **Click literally anywhere** - Any country, island, mountain, or geographical feature
-- **Random Discovery** - "I'm Feeling Lucky" button for random location exploration
-- **Multiple Map Styles** - Satellite, streets, outdoors, and more
-
-### Save & Share
-- **Research History** - Save and revisit your discoveries
-- **Shareable Links** - Generate public links to research
-- **Mobile responsive** - Works on phone/tablet/desktop
-
-## Technology Stack
-
-### Research
-- **[Valyu DeepResearch API](https://platform.valyu.ai)** - Comprehensive search across databases, archives, academic sources
-
-### Frontend
-- **[Next.js 15](https://nextjs.org)** + **[React 19](https://react.dev)** - Modern web framework
-- **[Mapbox GL JS](https://www.mapbox.com/mapbox-gljs)** - Interactive 3D globe visualization
-- **[Tailwind CSS](https://tailwindcss.com)** + **[Framer Motion](https://www.framer.com/motion/)** - Beautiful UI with smooth animations
-- **[React Markdown](https://github.com/remarkjs/react-markdown)** - Rendering research reports
-
-### Backend
-- **[Supabase](https://supabase.com)** - Authentication and database (valyu mode)
-- **[SQLite](https://www.sqlite.org/)** - Local database (self-hosted mode)
-- **[Drizzle ORM](https://orm.drizzle.team/)** - Type-safe database queries
-
-### Infrastructure
-- **[Vercel](https://vercel.com)** - Deployment and hosting
-- **TypeScript** - Type safety throughout
-
-Fully open-source. Self-hostable. Model-agnostic.
-
-## Quick Start (Self-Hosted)
-
-Self-hosted mode is the recommended way to run History locally. It requires only 2 API keys and takes about 5 minutes to set up.
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
-- pnpm (`npm install -g pnpm`)
-- Valyu DeepResearch API key ([get one free at platform.valyu.ai](https://platform.valyu.ai))
-- Mapbox access token ([get one free at mapbox.com](https://account.mapbox.com))
+- Node.js 20+
+- npm
 
-### Installation
+### Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yorkeccak/history.git
-   cd history
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/htkhgsj/history.git
+cd history
 
-2. **Install dependencies**
-   ```bash
-   pnpm install
-   ```
+# Install dependencies
+npm install
 
-3. **Set up environment variables**
+# Copy environment template
+cp .env.example .env.local
 
-   Create a `.env.local` file in the root directory:
+# Edit .env.local and add your research API key (optional, for AI research features)
+# VALYU_API_KEY=valyu_your_key_here
 
-   ```env
-   # Self-Hosted Mode - No Auth Required
-   NEXT_PUBLIC_APP_MODE=self-hosted
-
-   # Valyu API (Required)
-   VALYU_API_KEY=valyu_your_api_key_here
-
-   # Mapbox Configuration (Required)
-   NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your_mapbox_access_token_here
-
-   # App URL
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
-   ```
-
-4. **Run the development server**
-   ```bash
-   pnpm dev
-   ```
-
-5. **Open your browser**
-
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-6. **Start exploring**
-
-   - Click anywhere on the globe to research that location
-   - Use the "Random Location" button to discover somewhere new
-   - Watch the AI research unfold in real-time
-
-## How to Use
-
-### Basic Usage
-
-1. **Navigate the Globe**
-   - Drag to rotate
-   - Scroll to zoom in/out
-   - The globe auto-rotates when idle
-
-2. **Research a Location**
-   - Click on any country, city, island, or geographical feature
-   - A popup will show the location name
-   - The research interface opens automatically
-
-3. **Watch the Research**
-   - See the AI's reasoning process
-   - View tool calls (web searches, database queries)
-   - See sources being discovered in real-time
-
-4. **Review Results**
-   - Read the comprehensive historical analysis
-   - Click on source citations to verify information
-   - View images and visual aids (if available)
-
-5. **Save for Later**
-   - Your research is automatically saved locally
-   - Access past research from the sidebar
-
-### Advanced Features
-
-- **Random Discovery**: Click "Random Location" to explore a random place on Earth
-- **Map Styles**: Switch between satellite, streets, and other map styles
-- **Reasoning View**: Click to see the detailed reasoning trace of the AI
-- **Dark Mode**: Automatically matches your system preferences
-
-## App Modes
-
-History runs in self-hosted mode:
-
-### Self-Hosted Mode (Recommended)
-```env
-NEXT_PUBLIC_APP_MODE=self-hosted
+# Start development server
+npm run dev
 ```
 
-**Features:**
-- No Supabase required - uses local SQLite
-- No authentication needed - auto-login as dev user
-- Unlimited queries - no rate limits
-- Uses your Valyu API key directly
-- Works completely offline (except API calls)
-- Perfect for local usage and contributing
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Deploy to Vercel
+### Environment Variables
 
-The quickest way to get History running in production:
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_APP_MODE` | Yes | Set to `self-hosted` |
+| `VALYU_API_KEY` | Optional | For AI-powered historical research |
+| `OPENAI_API_KEY` | Optional | For AI image selection |
 
-1. **Fork this repository** to your GitHub account
-2. **Create a new project** on [vercel.com](https://vercel.com) and import your fork
-3. **Add environment variables** in Vercel project settings (Settings > Environment Variables):
-   - `NEXT_PUBLIC_APP_MODE` = `self-hosted`
-   - `VALYU_API_KEY` = your Valyu API key
-   - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` = your Mapbox access token
-4. **Deploy** - Vercel handles the rest
+**No MapBox token needed** — the map uses free open-source tile providers.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyorkeccak%2Fhistory&env=NEXT_PUBLIC_APP_MODE,VALYU_API_KEY,NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN&envDescription=API%20keys%20needed%20for%20History&envLink=https%3A%2F%2Fgithub.com%2Fyorkeccak%2Fhistory%23quick-start-self-hosted)
+### Build for Production
 
-## Getting API Keys
-
-### Valyu API (Required)
-
-1. Go to [platform.valyu.ai](https://platform.valyu.ai)
-2. Sign up for a free account
-3. Navigate to API Keys
-4. Create a new API key
-5. Add it to `.env.local` as `VALYU_API_KEY`
-
-**Pricing:**
-- Free tier available for testing
-- Pay-as-you-go pricing for production
-- Fast model: approximately $0.10 per research
-- Heavy model: approximately $0.50 per research
-
-### Mapbox Access Token (Required)
-
-1. Go to [mapbox.com](https://account.mapbox.com)
-2. Sign up for a free account
-3. Create a new access token
-4. Add it to `.env.local` as `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`
-
-**Pricing:**
-- 50,000 free map loads per month
-- Additional usage billed per load (very affordable)
-
-## Database Schema
-
-History uses a minimal database schema optimized for the DeepResearch API:
-
-### `users`
-```sql
-- id: UUID (primary key)
-- email: text
-- avatar_url: text
-- subscription_tier: enum (free, pay_per_use, subscription)
-- subscription_status: enum (active, inactive)
-- polar_customer_id: text
-- subscription_id: text
-- created_at: timestamp
-- updated_at: timestamp
+```bash
+npm run build
+npm start
 ```
 
-### `research_tasks`
-```sql
-- id: UUID (primary key)
-- user_id: UUID (foreign key to users)
-- deepresearch_id: text (Valyu API task ID)
-- location_name: text
-- location_lat: float
-- location_lng: float
-- location_images: jsonb
-- status: enum (queued, running, completed, failed)
-- anonymous_id: text
-- is_public: boolean
-- share_token: text
-- shared_at: timestamp
-- created_at: timestamp
-- updated_at: timestamp
-- completed_at: timestamp
-```
+## Map Themes
 
-### `user_rate_limits`
-```sql
-- id: UUID (primary key)
-- user_id: UUID (foreign key to users)
-- usage_count: integer
-- reset_date: text
-- monthly_usage_count: integer
-- monthly_reset_date: text
-- last_request_at: timestamp
-- created_at: timestamp
-- updated_at: timestamp
-```
+Available globe themes (selectable in sidebar):
 
-**Note:** Full research content is stored in Valyu's DeepResearch API. We only store metadata and task IDs, keeping the database lean and avoiding duplication.
+- **Dark Matter** — Dark minimal basemap (default)
+- **Positron** — Light minimal basemap
+- **Liberty** — OpenFreeMap classic style
+- **Bright** — OpenFreeMap bright style
 
-## Contributing
+## Five Dynasties Data
 
-History is fully open-source. Contributions are welcome and appreciated.
+The GeoJSON data at `public/data/five-dynasties.geojson` contains simplified polygon boundaries for:
 
-### How to Contribute
+| Kingdom | Chinese | Period |
+|---------|---------|--------|
+| Later Liang | 后梁 | 907-923 |
+| Southern Tang | 南唐 | 937-975 |
+| Wuyue | 吴越 | 907-978 |
+| Min | 闽 | 909-945 |
+| Southern Han | 南汉 | 917-971 |
+| Chu | 楚 | 907-951 |
+| Former Shu | 前蜀 | 907-925 |
+| Jingnan | 荆南 | 924-963 |
+| Northern Han | 北汉 | 951-979 |
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Test in self-hosted mode (`NEXT_PUBLIC_APP_MODE=self-hosted`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+Click any colored territory on the globe to see its name and period.
 
-For bugs or feature requests, [open an issue](https://github.com/yorkeccak/history/issues) or start a [discussion](https://github.com/yorkeccak/history/discussions).
+## Tech Stack
 
-### Areas for Contribution
-
-- Additional map styles and visualizations
-- Location bookmarking and collections
-- Image galleries for historical locations
-- Mobile app optimizations
-- Multi-language support
-- Data visualizations (timelines, charts)
-- Advanced search and filtering
-- Accessibility improvements
-
-## Who This Is For
-
-If you also spend hours clicking random islands on Google Maps, you'll understand why this needed to exist.
-
-Perfect for:
-- People who doomscroll maps like me
-- History researchers who need quick location context
-- Travel planners researching destinations
-- Students learning world geography
-- Anyone curious about literally any place on Earth
-
-## Known Issues & Limitations
-
-- Mapbox free tier limited to 50k loads/month
-- DeepResearch API calls cost money (though very reasonable)
-- Globe performance may be slower on older devices
-- Some remote locations may have limited historical data
+- **Next.js 15** with Turbopack
+- **MapLibre GL JS v5** — 3D globe with open-source tiles
+- **React 19** + TypeScript
+- **Tailwind CSS 4**
+- **Framer Motion** — Animations
 
 ## License
 
-This project is open-source and available under the MIT License.
-
-## Support & Questions
-
-- **Issues**: [Open an issue](https://github.com/yorkeccak/history/issues) on GitHub
-- **Discussions**: [Join the discussion](https://github.com/yorkeccak/history/discussions)
-- **Hosted Version**: Try it at [history.valyu.ai](https://history.valyu.ai)
-
-## Roadmap
-
-Future features under consideration:
-
-- Timeline visualization with historical events
-- Multiple locations comparison
-- Historical image galleries from archives
-- PDF export of research reports
-- Collaborative research sharing
-- Location bookmarks and collections
-- Advanced filters (time periods, topics, event types)
-- Mobile app versions (iOS, Android)
-- Offline mode with cached research
-- 3D historical recreations
-- AR view for mobile devices
-
-## Inspiration & Acknowledgments
-
-This project was born from countless hours spent exploring Google Maps, clicking on random islands, mountains, and remote places at 2am, and wanting to know their stories. Special thanks to:
-
-- **[Valyu](https://valyu.ai)** - For building an incredible DeepResearch API that makes this possible
-- **[Mapbox](https://mapbox.com)** - For beautiful, performant globe visualization
-- **[Supabase](https://supabase.com)** - For making authentication and databases simple
-
----
-
-**Built for geography enthusiasts, history buffs, map doomscrollers, and curious minds everywhere.**
-
-*Explore. Discover. Learn.*
+Same as upstream — see [LICENSE](LICENSE).

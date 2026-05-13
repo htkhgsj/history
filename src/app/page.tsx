@@ -30,7 +30,7 @@ function HomeContent() {
   const [confirmLocation, setConfirmLocation] = useState<{ name: string; lat: number; lng: number } | null>(null);
   const [customInstructions, setCustomInstructions] = useState<string | undefined>(undefined);
   const [excludedSources, setExcludedSources] = useState<string[] | undefined>(undefined);
-  const [globeTheme, setGlobeTheme] = useState<GlobeTheme>('satellite-streets-v12');
+  const [globeTheme, setGlobeTheme] = useState<GlobeTheme>('dark-matter');
   const globeRef = useRef<any>(null);
   const [showMobileSettings, setShowMobileSettings] = useState(false);
   const [showMobileSubscription, setShowMobileSubscription] = useState(false);

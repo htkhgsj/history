@@ -1,0 +1,140 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "后梁 Later Liang",
+        "name_en": "Later Liang",
+        "name_zh": "后梁",
+        "color": "#e63946",
+        "period": "907-923",
+        "type": "dynasty"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[110, 33], [116, 33], [116, 36], [114, 37], [110, 36], [110, 33]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "南唐 Southern Tang",
+        "name_en": "Southern Tang",
+        "name_zh": "南唐",
+        "color": "#457b9d",
+        "period": "937-975",
+        "type": "kingdom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[114, 28], [119, 28], [120, 30], [119, 33], [116, 33], [114, 32], [114, 28]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "吴越 Wuyue",
+        "name_en": "Wuyue",
+        "name_zh": "吴越",
+        "color": "#1d3557",
+        "period": "907-978",
+        "type": "kingdom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[119, 28], [122, 28], [122, 31], [120, 31], [119, 30], [119, 28]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "闽 Min",
+        "name_en": "Min",
+        "name_zh": "闽",
+        "color": "#6a994e",
+        "period": "909-945",
+        "type": "kingdom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[116, 24], [120, 24], [120, 27], [118, 28], [116, 27], [116, 24]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "南汉 Southern Han",
+        "name_en": "Southern Han",
+        "name_zh": "南汉",
+        "color": "#bc6c25",
+        "period": "917-971",
+        "type": "kingdom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[106, 21], [116, 21], [116, 24], [113, 26], [108, 25], [106, 23], [106, 21]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "楚 Chu",
+        "name_en": "Chu",
+        "name_zh": "楚",
+        "color": "#dda15e",
+        "period": "907-951",
+        "type": "kingdom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[108, 25], [113, 26], [114, 28], [113, 30], [110, 30], [108, 28], [108, 25]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "前蜀 Former Shu",
+        "name_en": "Former Shu",
+        "name_zh": "前蜀",
+        "color": "#606c38",
+        "period": "907-925",
+        "type": "kingdom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[102, 28], [108, 28], [108, 32], [106, 34], [102, 33], [101, 30], [102, 28]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "荆南 Jingnan",
+        "name_en": "Jingnan",
+        "name_zh": "荆南",
+        "color": "#9b2226",
+        "period": "924-963",
+        "type": "kingdom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[110, 29.5], [113, 29.5], [113, 31.5], [110, 31.5], [110, 29.5]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "北汉 Northern Han",
+        "name_en": "Northern Han",
+        "name_zh": "北汉",
+        "color": "#ae2012",
+        "period": "951-979",
+        "type": "kingdom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[110, 36], [114, 36], [114, 39], [112, 40], [110, 39], [110, 36]]]
+      }
+    }
+  ]
+}

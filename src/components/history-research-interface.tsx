@@ -907,7 +907,7 @@ export function HistoryResearchInterface({ location, onClose, onTaskCreated, ini
               <div className="flex-1 rounded-lg overflow-hidden border border-border/50 shadow-xl">
                 <Globe
                   onLocationClick={handleGlobeLocationClick}
-                  theme="satellite-streets-v12"
+                  theme="dark-matter"
                   initialCenter={globeInitialCenter}
                   initialZoom={globeInitialCenter ? 4 : undefined}
                   marker={globeMarker}
@@ -1271,7 +1271,7 @@ export function HistoryResearchInterface({ location, onClose, onTaskCreated, ini
             <div className="h-full rounded-lg overflow-hidden border border-border/50 shadow-xl">
               <Globe
                 onLocationClick={handleGlobeLocationClick}
-                theme="satellite-streets-v12"
+                theme="dark-matter"
                 initialCenter={globeInitialCenter}
                 initialZoom={globeInitialCenter ? 3 : undefined}
                 marker={globeMarker}

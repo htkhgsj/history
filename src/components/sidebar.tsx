@@ -664,14 +664,10 @@ export function Sidebar({
               </div>
               <div className="space-y-1.5 sm:space-y-2">
                 {[
-                  { value: 'satellite-streets-v12', label: 'Satellite Streets', description: 'Satellite imagery with labels' },
-                  { value: 'satellite-v9', label: 'Satellite', description: 'Pure satellite imagery' },
-                  { value: 'streets-v12', label: 'Streets', description: 'Classic street map' },
-                  { value: 'outdoors-v12', label: 'Outdoors', description: 'Topographic style' },
-                  { value: 'light-v11', label: 'Light', description: 'Minimal light theme' },
-                  { value: 'dark-v11', label: 'Dark', description: 'Minimal dark theme' },
-                  { value: 'navigation-day-v1', label: 'Navigation Day', description: 'Navigation optimized' },
-                  { value: 'navigation-night-v1', label: 'Navigation Night', description: 'Night mode navigation' },
+                  { value: 'dark-matter', label: 'Dark Matter', description: 'Dark minimal theme' },
+                  { value: 'positron', label: 'Positron', description: 'Light minimal theme' },
+                  { value: 'liberty', label: 'Liberty', description: 'OpenFreeMap classic' },
+                  { value: 'bright', label: 'Bright', description: 'OpenFreeMap bright' },
                 ].map((option) => (
                   <button
                     key={option.value}

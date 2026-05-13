@@ -1,23 +1,26 @@
 'use client';
 
 import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 export type GlobeTheme =
-  | 'satellite-streets-v12'
-  | 'satellite-v9'
-  | 'streets-v12'
-  | 'outdoors-v12'
-  | 'light-v11'
-  | 'dark-v11'
-  | 'navigation-day-v1'
-  | 'navigation-night-v1';
+  | 'dark-matter'
+  | 'positron'
+  | 'liberty'
+  | 'bright';
+
+const THEME_STYLES: Record<GlobeTheme, string> = {
+  'dark-matter': 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+  'positron': 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+  'liberty': 'https://tiles.openfreemap.org/styles/liberty',
+  'bright': 'https://tiles.openfreemap.org/styles/bright',
+};
 
 interface GlobeProps {
   onLocationClick: (location: { name: string; lat: number; lng: number }) => void;
   theme?: GlobeTheme;
-  initialCenter?: [number, number]; // [lng, lat]
+  initialCenter?: [number, number];
   initialZoom?: number;
   marker?: { lat: number; lng: number };
   disableInteraction?: boolean;
@@ -27,75 +30,102 @@ export interface GlobeRef {
   selectRandomLocation: () => void;
 }
 
-// Suppress Mapbox abort errors globally - these are harmless and occur during normal operations
+// Suppress abort errors globally
 if (typeof window !== 'undefined') {
-  // Add global error event listener to catch unhandled Mapbox AbortErrors
   const handleError = (event: ErrorEvent) => {
     if (event.error?.name === 'AbortError' || event.message?.includes('aborted')) {
       event.preventDefault();
-      return;
     }
   };
-
   window.addEventListener('error', handleError);
 
-  // Add unhandledrejection handler for promises
   const handleRejection = (event: PromiseRejectionEvent) => {
     const reason = event.reason;
     if (reason?.name === 'AbortError' || reason?.message?.includes('aborted')) {
       event.preventDefault();
-      return;
     }
   };
-
   window.addEventListener('unhandledrejection', handleRejection);
 }
 
-export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocationClick, theme = 'satellite-streets-v12', initialCenter, initialZoom, marker, disableInteraction = false }, ref) {
+export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocationClick, theme = 'dark-matter', initialCenter, initialZoom, marker, disableInteraction = false }, ref) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const markerRef = useRef<maplibregl.Marker | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-
-    if (!mapboxToken) {
-      setError('Mapbox access token is not configured');
-      setIsLoading(false);
-      return;
-    }
-
-    mapboxgl.accessToken = mapboxToken;
-
     try {
-      const map = new mapboxgl.Map({
+      const styleUrl = THEME_STYLES[theme] || THEME_STYLES['dark-matter'];
+
+      const map = new maplibregl.Map({
         container: mapContainerRef.current,
-        // Use selected theme style
-        style: `mapbox://styles/mapbox/${theme}`,
-        center: initialCenter || [0, 30], // Use provided center or default world view
-        zoom: initialZoom || 1.2,
-        projection: 'globe' as any, // Enable globe projection
+        style: styleUrl,
+        center: initialCenter || [112, 33], // Five Dynasties center (Central China)
+        zoom: initialZoom || 4,
         pitch: 0,
         bearing: 0,
-        attributionControl: false, // Remove text attribution
-        logoPosition: 'bottom-right' as any, // Move logo to bottom-right (less prominent)
-      });
+        attributionControl: false,
+      } as any);
+
+      // Enable globe projection
+      (map as any).setProjection('globe');
 
       mapRef.current = map;
 
-
       map.on('load', () => {
-        // Set fog for atmosphere effect
-        map.setFog({});
+        // Set atmosphere/fog for globe effect
+        (map as any).setFog({});
         setIsLoading(false);
+
+        // Add Five Dynasties GeoJSON data
+        map.addSource('five-dynasties', {
+          type: 'geojson',
+          data: '/data/five-dynasties.geojson'
+        });
+
+        map.addLayer({
+          id: 'kingdoms-fill',
+          type: 'fill',
+          source: 'five-dynasties',
+          paint: {
+            'fill-color': ['get', 'color'],
+            'fill-opacity': 0.45
+          }
+        });
+
+        map.addLayer({
+          id: 'kingdoms-outline',
+          type: 'line',
+          source: 'five-dynasties',
+          paint: {
+            'line-color': ['get', 'color'],
+            'line-width': 2,
+            'line-opacity': 0.8
+          }
+        });
+
+        map.addLayer({
+          id: 'kingdoms-labels',
+          type: 'symbol',
+          source: 'five-dynasties',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 12,
+            'text-anchor': 'center',
+          },
+          paint: {
+            'text-color': '#ffffff',
+            'text-halo-color': '#000000',
+            'text-halo-width': 1
+          }
+        });
 
         // Add marker if provided
         if (marker) {
-          // Create a custom marker element
           const el = document.createElement('div');
           el.className = 'location-marker';
           el.style.width = '32px';
@@ -104,16 +134,16 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
           el.style.backgroundSize = 'cover';
           el.style.cursor = 'pointer';
 
-          markerRef.current = new mapboxgl.Marker(el)
+          markerRef.current = new maplibregl.Marker({ element: el })
             .setLngLat([marker.lng, marker.lat])
             .addTo(map);
         }
 
-        // Auto-rotation logic with proper interaction detection (only if no marker)
+        // Auto-rotation logic
         let userInteracting = false;
-        let spinEnabled = !marker; // Disable spin if marker is present
-        const secondsPerRevolution = 120; // Slower rotation
-        const maxSpinZoom = 5; // Stop spinning when zoomed in
+        let spinEnabled = !marker;
+        const secondsPerRevolution = 120;
+        const maxSpinZoom = 5;
         const slowSpinZoom = 3;
 
         function spinGlobe() {
@@ -121,170 +151,62 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
           if (spinEnabled && !userInteracting && zoom < maxSpinZoom && !marker) {
             let distancePerSecond = 360 / secondsPerRevolution;
             if (zoom > slowSpinZoom) {
-              // Slow down rotation when zoomed in
               const zoomDif = (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom);
               distancePerSecond *= zoomDif;
             }
             const center = map.getCenter();
-            center.lng -= distancePerSecond / 60; // 60 fps
-            map.easeTo({ center, duration: 1000 / 60, easing: (n) => n });
+            center.lng -= distancePerSecond / 60;
+            map.easeTo({ center, duration: 1000 / 60, easing: (n: number) => n });
           }
         }
 
-        // Pause rotation on any user interaction
-        map.on('mousedown', () => {
-          userInteracting = true;
-          spinEnabled = false;
-        });
-
-        map.on('mouseup', () => {
+        const pauseAndResume = () => {
           userInteracting = false;
-          // Resume spinning after 3 seconds of inactivity
-          setTimeout(() => {
-            if (!userInteracting) {
-              spinEnabled = true;
-            }
-          }, 3000);
-        });
+          setTimeout(() => { if (!userInteracting) spinEnabled = true; }, 3000);
+        };
 
-        map.on('dragend', () => {
-          userInteracting = false;
-          setTimeout(() => {
-            if (!userInteracting) {
-              spinEnabled = true;
-            }
-          }, 3000);
-        });
+        map.on('mousedown', () => { userInteracting = true; spinEnabled = false; });
+        map.on('mouseup', pauseAndResume);
+        map.on('dragend', pauseAndResume);
+        map.on('pitchend', pauseAndResume);
+        map.on('rotateend', pauseAndResume);
+        map.on('zoomstart', () => { userInteracting = true; spinEnabled = false; });
+        map.on('zoomend', pauseAndResume);
+        map.on('touchstart', () => { userInteracting = true; spinEnabled = false; });
+        map.on('touchend', pauseAndResume);
 
-        map.on('pitchend', () => {
-          userInteracting = false;
-          setTimeout(() => {
-            if (!userInteracting) {
-              spinEnabled = true;
-            }
-          }, 3000);
-        });
-
-        map.on('rotateend', () => {
-          userInteracting = false;
-          setTimeout(() => {
-            if (!userInteracting) {
-              spinEnabled = true;
-            }
-          }, 3000);
-        });
-
-        // Pause on zoom
-        map.on('zoomstart', () => {
-          userInteracting = true;
-          spinEnabled = false;
-        });
-
-        map.on('zoomend', () => {
-          userInteracting = false;
-          setTimeout(() => {
-            if (!userInteracting) {
-              spinEnabled = true;
-            }
-          }, 3000);
-        });
-
-        // Touch events
-        map.on('touchstart', () => {
-          userInteracting = true;
-          spinEnabled = false;
-        });
-
-        map.on('touchend', () => {
-          userInteracting = false;
-          setTimeout(() => {
-            if (!userInteracting) {
-              spinEnabled = true;
-            }
-          }, 3000);
-        });
-
-        // Start the animation loop
         spinGlobe();
-        setInterval(spinGlobe, 1000 / 60); // 60 fps
+        setInterval(spinGlobe, 1000 / 60);
       });
 
-      // Handle clicks on the map (only if no marker and interaction enabled)
+      // Handle clicks - detect kingdom features
       if (!marker && !disableInteraction) {
-        map.on('click', async (e) => {
-        const { lng, lat } = e.lngLat;
-        const zoom = map.getZoom();
+        map.on('click', (e) => {
+          const features = map.queryRenderedFeatures(e.point, { layers: ['kingdoms-fill'] });
 
-        try {
-          // Reverse geocode to get the location name with types parameter
-          const response = await fetch(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=country,region,place,locality,district&access_token=${mapboxToken}`
-          );
-          const data = await response.json();
+          if (features && features.length > 0) {
+            const feature = features[0];
+            const name = (feature.properties?.name as string) || `Location (${e.lngLat.lat.toFixed(2)}, ${e.lngLat.lng.toFixed(2)})`;
+            const period = feature.properties?.period || '';
 
-          if (data.features && data.features.length > 0) {
-            // Select appropriate feature based on zoom level
-            let selectedFeature = data.features[0];
-
-            // Zoom level guidelines:
-            // < 5: World/Continental view - ALWAYS prefer country
-            // 5-7: Country view - prefer country or large region
-            // 7-10: Regional view - prefer region or place
-            // > 10: City view - prefer place or locality
-
-            if (zoom < 5) {
-              // Zoomed out - ALWAYS prefer country
-              selectedFeature = data.features.find((f: any) => f.place_type?.includes('country')) || data.features[0];
-            } else if (zoom < 7) {
-              // Medium zoom - prefer country or large region
-              selectedFeature = data.features.find((f: any) =>
-                f.place_type?.includes('country') || f.place_type?.includes('region')
-              ) || data.features[0];
-            } else if (zoom < 10) {
-              // Zoomed in - prefer region or place
-              selectedFeature = data.features.find((f: any) =>
-                f.place_type?.includes('region') || f.place_type?.includes('place')
-              ) || data.features[0];
-            }
-            // Else: use most specific (default first feature) for very zoomed in views
-
-            const locationName = selectedFeature.place_name || selectedFeature.text || `Location (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
-
-            // Add a marker
-            new mapboxgl.Marker({ color: '#FF6B6B' })
-              .setLngLat([lng, lat])
+            new maplibregl.Marker({ color: '#FF6B6B' })
+              .setLngLat([e.lngLat.lng, e.lngLat.lat])
               .setPopup(
-                new mapboxgl.Popup({ offset: 25 })
-                  .setHTML(`<h3 class="font-semibold">${locationName}</h3><p class="text-sm">Click to research history</p>`)
+                new maplibregl.Popup({ offset: 25 })
+                  .setHTML(`<h3 style="font-weight:600">${name}</h3><p style="font-size:12px">${period}</p>`)
               )
               .addTo(map);
 
-            // Trigger the location click callback
-            onLocationClick({
-              name: locationName,
-              lat,
-              lng,
-            });
+            onLocationClick({ name, lat: e.lngLat.lat, lng: e.lngLat.lng });
+          } else {
+            const name = `Location (${e.lngLat.lat.toFixed(2)}, ${e.lngLat.lng.toFixed(2)})`;
+            onLocationClick({ name, lat: e.lngLat.lat, lng: e.lngLat.lng });
           }
-        } catch (error) {
-          // Fallback: use coordinates
-          onLocationClick({
-            name: `Location (${lat.toFixed(2)}, ${lng.toFixed(2)})`,
-            lat,
-            lng,
-          });
-        }
         });
       }
 
-      // Change cursor on hover
-      map.on('mouseenter', () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-
-      map.on('mouseleave', () => {
-        map.getCanvas().style.cursor = '';
-      });
+      map.on('mouseenter', () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', () => { map.getCanvas().style.cursor = ''; });
 
     } catch (err) {
       setError('Failed to initialize map');
@@ -293,88 +215,39 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
 
     return () => {
       if (mapRef.current) {
-        try {
-          // Remove the map - this will clean up all event listeners automatically
-          mapRef.current.remove();
-        } catch (error) {
-          // Completely suppress all errors during cleanup - they're harmless
-          // AbortErrors occur when Mapbox cancels ongoing tile requests during unmount
-        }
+        try { mapRef.current.remove(); } catch (e) { /* suppress */ }
         mapRef.current = null;
       }
     };
   }, [onLocationClick, theme]);
 
-  // Update map style when theme changes
   useEffect(() => {
     if (mapRef.current && !isLoading) {
-      mapRef.current.setStyle(`mapbox://styles/mapbox/${theme}`);
+      const styleUrl = THEME_STYLES[theme as GlobeTheme] || THEME_STYLES['dark-matter'];
+      mapRef.current.setStyle(styleUrl);
     }
   }, [theme, isLoading]);
 
-  // Expose methods to parent via ref
   useImperativeHandle(ref, () => ({
     selectRandomLocation: async () => {
       if (!mapRef.current) return;
-
       const map = mapRef.current;
-      const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-      if (!mapboxToken) return;
 
-      // Generate random coordinates
-      const lat = (Math.random() * 180) - 90; // -90 to 90
-      const lng = (Math.random() * 360) - 180; // -180 to 180
+      // Random location within China region
+      const lat = 22 + Math.random() * 18; // 22-40N
+      const lng = 100 + Math.random() * 22; // 100-122E
 
-      // Spin the globe to the location with animation
       map.easeTo({
         center: [lng, lat],
-        zoom: 3,
+        zoom: 5,
         duration: 2000,
-        easing: (t) => t * (2 - t), // easeOutQuad
+        easing: (t: number) => t * (2 - t),
       });
 
-      // After animation, perform reverse geocoding and trigger selection
-      setTimeout(async () => {
-        try {
-          // Use types parameter to get country-level results
-          const response = await fetch(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=country,region,place&access_token=${mapboxToken}`
-          );
-          const data = await response.json();
-
-          if (data.features && data.features.length > 0) {
-            // Prefer country or region for random selection (zoom is 3)
-            const selectedFeature = data.features.find((f: any) =>
-              f.place_type?.includes('country') || f.place_type?.includes('region')
-            ) || data.features[0];
-
-            const locationName = selectedFeature.place_name || selectedFeature.text || `Location (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
-
-            // Add a marker
-            new mapboxgl.Marker({ color: '#FF6B6B' })
-              .setLngLat([lng, lat])
-              .setPopup(
-                new mapboxgl.Popup({ offset: 25 })
-                  .setHTML(`<h3 class="font-semibold">${locationName}</h3><p class="text-sm">Researching history...</p>`)
-              )
-              .addTo(map);
-
-            // Trigger the location click callback
-            onLocationClick({
-              name: locationName,
-              lat,
-              lng,
-            });
-          }
-        } catch (error) {
-          // Fallback: use coordinates
-          onLocationClick({
-            name: `Location (${lat.toFixed(2)}, ${lng.toFixed(2)})`,
-            lat,
-            lng,
-          });
-        }
-      }, 2100); // Slightly after animation completes
+      setTimeout(() => {
+        const name = `Location (${lat.toFixed(2)}, ${lng.toFixed(2)})`;
+        onLocationClick({ name, lat, lng });
+      }, 2100);
     },
   }));
 
@@ -384,9 +257,6 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
         <div className="text-center">
           <h3 className="text-lg font-semibold text-destructive mb-2">Map Error</h3>
           <p className="text-sm text-muted-foreground">{error}</p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Please check your Mapbox configuration
-          </p>
         </div>
       </div>
     );
@@ -405,8 +275,8 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
       <div ref={mapContainerRef} className="w-full h-full" />
       {!marker && (
         <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-          <p className="text-sm font-medium">Click anywhere on the globe to research its history</p>
-          <p className="text-xs text-muted-foreground mt-1">Rotation pauses when you interact</p>
+          <p className="text-sm font-medium">Click anywhere to explore Five Dynasties and Ten Kingdoms</p>
+          <p className="text-xs text-muted-foreground mt-1">五代十国 (907-979 AD)</p>
         </div>
       )}
     </div>

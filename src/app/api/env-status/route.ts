@@ -9,13 +9,9 @@ export async function GET() {
       process.env.DEEPRESEARCH_API_KEY || process.env.VALYU_API_KEY
     );
 
-    // Check for Mapbox access token
-    const mapboxKeyPresent = !!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-
     return NextResponse.json(
       {
         deepresearchKeyPresent,
-        mapboxKeyPresent,
       },
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
