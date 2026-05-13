@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { TerritoryAnimationEngine } from '@/lib/territory-animation';
+import type { KeyframeData } from '@/lib/territory-animation';
 
 export type GlobeTheme =
   | 'dark-matter'
@@ -24,6 +26,7 @@ interface GlobeProps {
   initialZoom?: number;
   marker?: { lat: number; lng: number };
   disableInteraction?: boolean;
+  year?: number;
 }
 
 export interface GlobeRef {
@@ -48,10 +51,11 @@ if (typeof window !== 'undefined') {
   window.addEventListener('unhandledrejection', handleRejection);
 }
 
-export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocationClick, theme = 'dark-matter', initialCenter, initialZoom, marker, disableInteraction = false }, ref) {
+export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocationClick, theme = 'dark-matter', initialCenter, initialZoom, marker, disableInteraction = false, year }, ref) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker | null>(null);
+  const engineRef = useRef<TerritoryAnimationEngine | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,16 +81,27 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
         console.error('[Globe] Map error:', e.error?.message || e);
       });
 
-      map.on('load', () => {
+      map.on('load', async () => {
         // Enable globe projection after style is loaded
         (map as any).setProjection({ type: 'globe' });
 
-        setIsLoading(false);
+        // Load keyframe data and initialize animation engine
+        try {
+          const res = await fetch('/data/keyframes/five-dynasties.json');
+          const keyframeData: KeyframeData = await res.json();
+          engineRef.current = new TerritoryAnimationEngine(keyframeData);
+        } catch (e) {
+          console.error('[Globe] Failed to load keyframe data:', e);
+        }
 
-        // Add Five Dynasties GeoJSON data
+        // Add animated GeoJSON source
+        const initialState = engineRef.current
+          ? engineRef.current.getStateAtYear(year ?? 907)
+          : { type: 'FeatureCollection' as const, features: [] };
+
         map.addSource('five-dynasties', {
           type: 'geojson',
-          data: '/data/five-dynasties.geojson'
+          data: initialState as any,
         });
 
         map.addLayer({
@@ -125,6 +140,8 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
             'text-halo-width': 1
           }
         });
+
+        setIsLoading(false);
 
         // Add marker if provided
         if (marker) {
@@ -231,6 +248,16 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
     }
   }, [theme, isLoading]);
 
+  // Update territories when year changes
+  useEffect(() => {
+    if (!mapRef.current || !engineRef.current || isLoading || year === undefined) return;
+    const source = mapRef.current.getSource('five-dynasties') as maplibregl.GeoJSONSource | undefined;
+    if (source) {
+      const state = engineRef.current.getStateAtYear(year);
+      source.setData(state as any);
+    }
+  }, [year, isLoading]);
+
   useImperativeHandle(ref, () => ({
     selectRandomLocation: async () => {
       if (!mapRef.current) return;
@@ -276,12 +303,6 @@ export const Globe = forwardRef<GlobeRef, GlobeProps>(function Globe({ onLocatio
         </div>
       )}
       <div ref={mapContainerRef} className="w-full h-full" />
-      {!marker && (
-        <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-          <p className="text-sm font-medium">Click anywhere to explore Five Dynasties and Ten Kingdoms</p>
-          <p className="text-xs text-muted-foreground mt-1">五代十国 (907-979 AD)</p>
-        </div>
-      )}
     </div>
   );
 });

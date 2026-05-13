@@ -7,6 +7,7 @@ import { track } from '@vercel/analytics';
 import { CheckCircle, AlertCircle, Sparkles, Shuffle } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Globe, GlobeTheme } from '@/components/globe';
+import { TimelineSlider } from '@/components/timeline-slider';
 import { HistoryResearchInterface } from '@/components/history-research-interface';
 import { AuthModal } from '@/components/auth/auth-modal';
 import { useAuthStore } from '@/lib/stores/use-auth-store';
@@ -30,6 +31,7 @@ function HomeContent() {
   const [customInstructions, setCustomInstructions] = useState<string | undefined>(undefined);
   const [excludedSources, setExcludedSources] = useState<string[] | undefined>(undefined);
   const [globeTheme, setGlobeTheme] = useState<GlobeTheme>('dark-matter');
+  const [timelineYear, setTimelineYear] = useState(907);
   const globeRef = useRef<any>(null);
   const [showMobileSettings, setShowMobileSettings] = useState(false);
   const [showMobileSubscription, setShowMobileSubscription] = useState(false);
@@ -236,7 +238,23 @@ function HomeContent() {
 
         {/* Globe container */}
         <div className="flex-1 overflow-hidden relative">
-          <Globe ref={globeRef} onLocationClick={handleLocationClick} theme={globeTheme} />
+          <Globe ref={globeRef} onLocationClick={handleLocationClick} theme={globeTheme} year={timelineYear} />
+          <TimelineSlider
+            startYear={907}
+            endYear={960}
+            currentYear={timelineYear}
+            onYearChange={setTimelineYear}
+            keyframes={[
+              { year: 907, label: "朱温篡唐，五代十国始" },
+              { year: 923, label: "李存勖灭后梁，建后唐" },
+              { year: 925, label: "后唐灭前蜀" },
+              { year: 937, label: "吴亡南唐立，后晋取代后唐" },
+              { year: 945, label: "南唐灭闽" },
+              { year: 947, label: "后汉取代后晋" },
+              { year: 951, label: "后周取代后汉，北汉分裂" },
+              { year: 960, label: "赵匡胤陈桥兵变，北宋立" },
+            ]}
+          />
         </div>
 
         {/* Bottom bar */}
